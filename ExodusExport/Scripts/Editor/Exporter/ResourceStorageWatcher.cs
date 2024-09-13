@@ -8,10 +8,16 @@ namespace SceneExport{
 	This thing exists to monitor object mappers and OTHER structures of this kind....
 	It is necessary due to resource graph being possibly looping around.
 	*/
-	public class ResourceStorageWatcher<Storage, Resource>{
+	// 监视和管理资源存储对象中的资源，特别是用于检测新资源的添加
+		public class ResourceStorageWatcher<Storage, Resource>{
+		// default 关键字用于获取指定类型的默认值
+		// 表示当前监视的资源存储对象
 		Storage owner = default(Storage);
+		// 存储上一次记录的对象数量，用于比较当前对象数量，以检测是否有新对象被添加。
 		int lastNumObjects = 0;
+		// 一个委托，用于获取 Storage 对象中的对象数量。
 		System.Func<Storage, int> countGetter = null;
+		// 用于根据索引从 Storage 对象中获取特定的资源。
 		System.Func<Storage, int, Resource> indexedResourceGetter = null;
 
 		public struct IndexedObjectData{
@@ -39,13 +45,14 @@ namespace SceneExport{
 				return numObjects != lastNumObjects;
 			}
 		}
-
+	// 返回当前 Storage 中的对象数量
 		public int numObjects{
 			get{
 				return countGetter(owner);
 			}
 		}
 
+// 返回新添加进来的对象的索引的集合
 		public IEnumerable<int> getNewIndexes(){
 			if (!hasNewObjects)
 				yield break;
@@ -63,7 +70,7 @@ namespace SceneExport{
 		Resource getObject(int index){
 			return indexedResourceGetter(owner, index);
 		}
-
+		// 返回的是一个可枚举的集合，用foreach去遍历
 		public IEnumerable<IndexedObjectData> getNewObjectsData(){
 			foreach(var index in getNewIndexes()){
 				var obj = getObject(index);

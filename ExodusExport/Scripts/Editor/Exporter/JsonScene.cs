@@ -6,12 +6,15 @@ using UnityEngine.SceneManagement;
 
 namespace SceneExport{
 	[System.Serializable]
+	// 表示 Unity 场景的 JSON 数据结构
 	public class JsonScene: IFastJsonValue{
 		public string name;
 		public string path;
+		// 场景的构建索引，通常用于场景加载的顺序。
 		public int buildIndex = -1;
+		// 存储场景中所有游戏对象的列表
 		public List<JsonGameObject> objects = new List<JsonGameObject>();
-		
+		// 从 Unity 的 Scene 对象创建一个 JsonScene 实例
 		public static JsonScene fromScene(Scene scene, ResourceMapper resMap, bool showGui){
 			var rootObjects = scene.GetRootGameObjects();
 			var result = fromObjects(rootObjects, resMap, showGui);
@@ -24,17 +27,20 @@ namespace SceneExport{
 		public static JsonScene fromObject(GameObject arg, ResourceMapper resMap, bool showGui){
 			return fromObjects(new GameObject[]{arg}, resMap, showGui);
 		}
-		
+		// showGui 是否显示进度条
 		public static JsonScene fromObjects(GameObject[] args, ResourceMapper resMap, bool showGui){
 			try{
 				var result = new JsonScene();
-			
+				// 导出过程中用到的临时类
 				var objMap = new GameObjectMapper();
+			// 获取或创建id
+			// 将args中的每一个对象的子对象分配id，并添加进objMap.objectList和objMap.objectMap
 				foreach(var curObj in args){
 					objMap.gatherObjectIds(curObj);
 				}
 			
 				foreach(var curObj in objMap.objectList){
+					// 获取当前游戏对象的prefab信息并添加到resMapper.prefabs
 					resMap.gatherPrefabData(curObj);
 				}
 			

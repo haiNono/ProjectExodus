@@ -390,7 +390,7 @@ namespace SceneExport{
 			resMap.registerAssetPath(filePath);
 			path = filePath;
 			uniqueName = resMap.createUniqueAssetName(filePath, name, meshKey.getMeshAssetSuffix());
-
+			// 处理mesh的材质
 			var foundMaterials = resMap.findMeshMaterials(mesh);
 			if (foundMaterials != null){
 				foreach(var cur in foundMaterials){
@@ -401,7 +401,7 @@ namespace SceneExport{
 			#if !UNITY_EDITOR
 			readable = mesh.isReadable;
 			if (!readable){
-				Debug.LogErrorFormat(string.Format("Mesh {0} is not marked as readable. Cannot proceed", name);
+				Debug.LogErrorFormat(string.Format("Mesh {0} is not marked as readable. Cannot proceed", name));
 				return;
 			}
 			#endif
@@ -411,6 +411,7 @@ namespace SceneExport{
 				return;
 
 			colors = mesh.colors32.toByteArray();
+			// 顶点位置
 			verts = mesh.vertices.toFloatArray();
 			normals = mesh.normals.toFloatArray();
 			

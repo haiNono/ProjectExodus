@@ -16,6 +16,7 @@ namespace SceneExport{
 	
 [System.Serializable]
 public class ExporterWindow: EditorWindow{
+	// 当EditorWindow 类被挂载到 Unity编辑器上时，会默认调用OnEnable、OnGUI方法
 	[SerializeField]bool disclaimerVisible = true;
 	[SerializeField]Vector2 windowScrollPos;
 	[SerializeField]Vector2 disclaimerScrollPos;
@@ -51,6 +52,7 @@ public class ExporterWindow: EditorWindow{
 				break;
 			}
 			case(ExportType.CurrentScene):{
+				// 通过EditorSceneManager.GetActiveScene()读取场景
 				var scene = EditorSceneManager.GetActiveScene();
 				if (scene.IsValid())
 					return scene.name;
@@ -165,7 +167,7 @@ public class ExporterWindow: EditorWindow{
 			EditorGUILayout.LabelField(msg, guiStyles.errorLabel);
 		}
 	}
-	
+	// 点击 select target oath按钮的时候调用，设置目标路径
 	void processExportButtons(){
 		GUILayout.BeginHorizontal();
 		if (GUILayout.Button("2. Select Target Path")){
@@ -195,7 +197,8 @@ public class ExporterWindow: EditorWindow{
 		}
 		GUILayout.EndHorizontal();
 	}
-	
+	// 初始化GUI样式，绘制窗口内容
+	// 每一帧中被调用
 	void OnGUI(){
 		initGuiStyles();
 		
@@ -236,10 +239,11 @@ public class ExporterWindow: EditorWindow{
 			return;
 		}
 		var obj = Selection.activeGameObject;
+		// targetPath是个文件路径，不是目录
 		if (!checkTargetPath(targetPath))
 			return;
-				
-		var logger = new Logger();						
+		var logger = new Logger();	
+		// 返回 JsonProject类型
 		var proj = JsonProject.fromObject(obj, true);
 		proj.saveToFile(targetPath, true, true, logger);
 		ExportResultWindow.openWindow(logger);
@@ -275,14 +279,15 @@ public class ExporterWindow: EditorWindow{
 	}
 	
 	void beginFullProjectExport(){
-		var logger = new Logger();						
+		var logger = new Logger();		
+		// 创建一个 JsonProject实例
 		var proj = JsonProject.fromCurrentProject(true, logger);
 		if (proj != null){
 			proj.saveToFile(targetPath, true, true, logger);
 		}
 		ExportResultWindow.openWindow(logger);
 	}
-	
+	// 处理任务入口
 	void processExport(){
 		switch(exportType){
 			case(ExportType.CurrentObject):{

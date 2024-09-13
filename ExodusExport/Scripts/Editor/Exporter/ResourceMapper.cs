@@ -257,7 +257,7 @@ namespace SceneExport{
 			
 			return meshRegistry.getOrRegMeshId(meshKey, meshRend.gameObject, mesh);
 		}
-		
+		// 获取使用标识（是否为凸形碰撞体或三角形碰撞体
 		MeshUsageFlags getUsageFromComponents(Mesh mesh, MeshFilter meshFilter){
 			if (!meshFilter || !mesh)
 				throw new System.ArgumentNullException();
@@ -324,7 +324,7 @@ namespace SceneExport{
 			var rootPrefab = ExportUtility.getLinkedRootPrefabAsset(obj);
 			if (!rootPrefab)
 				return ResId.invalid;//ExportUtility.invalidId;
-			
+			// 如果找到了预制体，就把预制体添加到预制体列表中
 			var result = prefabs.getId(rootPrefab, createMissing, onNewRootPrefab);
 			
 			return result;
@@ -387,7 +387,7 @@ namespace SceneExport{
 		public delegate ReturnType IndexedObjectConverter<SrcType, ReturnType> (SrcType src, int index, ResId id);
 		public delegate ReturnType ObjectConverter<SrcType, ReturnType> (SrcType src);
 		
-
+		// 将源对象（srcObj）转换为目标对象（DstType），并将其保存为 JSON 文件到指定的路径。
 		static string saveResourceToPath<DstType, SrcType>(string baseDir, 
 				SrcType srcObj, int objIndex, ResId objId, int objCount,
 				IndexedObjectConverter<SrcType, DstType> converter,
@@ -411,11 +411,12 @@ namespace SceneExport{
 					fileName = makeJsonResourcePath(baseName, objIndex);	
 				}
 				var fullPath = System.IO.Path.Combine(baseDir, fileName);
-				
+				// JsonMesh.saveToJsonFile
 				dstObj.saveToJsonFile(fullPath);
 				return fileName;
 		}
 
+// where 关键字用于定义泛型类型参数的约束，确保传递给方法的类型满足特定条件。在你的代码中，它确保 DstType 必须实现 IFastJsonValue 接口，
 		static bool saveResourcesToPath<DstType, SrcType, StorageType>(
 				List<string> outObjectPaths,
 				string baseDir, 
@@ -431,6 +432,7 @@ namespace SceneExport{
 			bool result = false;
 			try{
 				if (objects != null){
+					// 遍历objects中新添加进去的数据，将其依次saveToPath，然后把保存的路径添加到outObjectPaths
 					foreach(var curData in objects.getNewObjectsData()){
 						outObjectPaths.Add(
 							saveResourceToPath(
@@ -597,6 +599,7 @@ namespace SceneExport{
 
 			//int lastSceneCount = 0;
 			///var sceneWatcher = scenes.createWatcher.... Nope!
+			///创建Watcher的时候记录了当下的各种资源的数量，在处理资源的过程中，遇到引用的资源会在对应的资源map中添加
 			var sceneWatcher = scenes.createWatcher();
 			var terrainWatcher = terrains.createWatcher();
 			var meshWatcher = meshRegistry.createWatcher();//meshes.createWatcher();
@@ -637,7 +640,8 @@ namespace SceneExport{
 				No more work to do, and the loop terminates.
 				*/
 				processObjects = false;
-
+				// |= 是一个位或赋值运算符。如果 saveResourcesToPath 返回 true，则 processObjects 将被设置为 true，表示有新资源被处理。
+				// saveResourcesToPath用来将资源保存到目标路径
 				processObjects |= saveResourcesToPath(result.scenes, baseDir, sceneWatcher, 
 					(objData) => objData, (obj) => obj.name, "scene", showGui);
 				processObjects |= saveResourcesToPath(result.terrains, baseDir, terrainWatcher, 

@@ -129,7 +129,7 @@ namespace SceneExport{
 				}
 			}
 		}
-		
+		// 将地形数据（包括高度图、阿尔法图和细节层）以二进制形式保存到指定的目标目录中。
 		public static void saveTerrain(JsonTerrainData curTerrain, string targetDir, string projectPath, bool savePngs, Logger logger = null){		
 			Logger.makeValid(ref logger);
 			//logger.logFormat("Saving terrain {0}, {1}, {2}", targetDir, projectPath, curTerrain);
@@ -144,7 +144,7 @@ namespace SceneExport{
 			
 			var heightPath = System.IO.Path.ChangeExtension(targetPath, ".height");
 			//logger.logFormat("Saving to \"{0}\", \"{1}\"", targetPath, heightPath);
-			
+			// 获取高度图和阿尔法图的分辨率:
 			var terData = curTerrain.terrainData;
 #if UNITY_2019_3_OR_NEWER //heightmap api changed in this release
 			int hMapW = terData.heightmapResolution;
@@ -154,13 +154,14 @@ namespace SceneExport{
 			int hMapH = terData.heightmapHeight;
 #endif
 			var numAlphas = terData.alphamapLayers;
-			//logger.logFormat("w: {0}; h: {1}; alphas: {2}", w, h, numAlphas);			
+			//logger.logFormat("w: {0}; h: {1}; alphas: {2}", w, h, numAlphas);		
+			// 获取高度数据和阿尔法图数据:	
 			var heightData = terData.GetHeights(0, 0, hMapW, hMapH);
 			
 			var alphaW = terData.alphamapWidth;
 			var alphaH = terData.alphamapHeight;
 			var alphaData = terData.GetAlphamaps(0, 0, alphaW, alphaH);
-			
+			// . 获取细节层信息
 			var detailW = terData.detailWidth;
 			var detailH = terData.detailHeight;
 			var detailPrototypes = terData.detailPrototypes;
@@ -168,6 +169,7 @@ namespace SceneExport{
 			//var numDetailLayers = terData.detailResolution;
 			
 			//binary map - all stuff combined together.
+			// 使用 BinaryWriter 写入数据:
 			using(var writer = new System.IO.BinaryWriter(
 					System.IO.File.Open(targetPath, System.IO.FileMode.Create))){
 				writer.Write(hMapW);

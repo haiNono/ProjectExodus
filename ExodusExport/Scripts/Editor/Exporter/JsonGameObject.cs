@@ -114,6 +114,7 @@ namespace SceneExport{
 			
 		public JsonGameObject(GameObject obj, GameObjectMapper objMap, ResourceMapper resMap){
 			name = obj.name;
+			// 获取当前游戏对象在场景中的完整路径
 			scenePath = obj.getScenePath();
 			instanceId = obj.GetInstanceID();
 			id = objMap.getId(obj);
@@ -133,6 +134,7 @@ namespace SceneExport{
 		#else
 			lightMapStatic = (flags & StaticEditorFlags.LightmapStatic) != 0;
 		#endif
+		// 与遮挡相关的属性
 			occluderStatic = (flags & StaticEditorFlags.OccluderStatic) != 0;
 			occludeeStatic = (flags & StaticEditorFlags.OccludeeStatic) != 0;
 			navigationStatic = (flags & StaticEditorFlags.NavigationStatic) != 0;
@@ -147,7 +149,7 @@ namespace SceneExport{
 			prefabObjectId = resMap.getPrefabObjectId(obj, true);
 			prefabInstance = Utility.isPrefabInstance(obj) || Utility.isPrefabModelInstance(obj);
 			//prefabInstance = (prefType == PrefabType.PrefabInstance) || (prefType == PrefabType.ModelPrefabInstance);			
-
+			// 渲染相关信息
 			renderer = JsonRendererData.makeRendererArray(obj.GetComponent<Renderer>(), resMap);
 			light = JsonLight.makeLightArray(obj.GetComponent<Light>());
 			reflectionProbes = 
@@ -200,6 +202,7 @@ namespace SceneExport{
 				ExportUtility.convertComponentsList<Animator, JsonAnimator>(obj, 
 					(c) => new JsonAnimator(c, resMap));
 					
+			// 读取网格信息，并向resMap中查询或者注册网格信息
 			var meshFilter = obj.GetComponent<MeshFilter>();
 			if (meshFilter){
 				mesh = resMap.getOrRegMeshId(meshFilter);

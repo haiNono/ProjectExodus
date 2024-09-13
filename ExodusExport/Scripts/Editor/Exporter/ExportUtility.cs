@@ -7,6 +7,7 @@ using UnityEditor.SceneManagement;
 
 namespace SceneExport{
 	public static class ExportUtility{
+		// 根据给定的 MeshCollider 返回其使用标志（如是否为凸形碰撞体或三角形碰撞体）
 		public static MeshUsageFlags getMeshUsageFlags(MeshCollider collider){
 			if (!collider)
 				return MeshUsageFlags.None;
@@ -14,7 +15,7 @@ namespace SceneExport{
 				return MeshUsageFlags.ConvexCollider;
 			return MeshUsageFlags.TriangleCollider;
 		}
-
+	// 检查给定的 GameObject 是否具有支持的组件（如 MeshRenderer、Light、SkinnedMeshRenderer 等
 		public static bool hasSupportedComponents(GameObject obj){
 			if (!obj)
 				throw new System.ArgumentNullException("obj");
@@ -30,16 +31,18 @@ namespace SceneExport{
 	
 		public static readonly int invalidId = -1;
 		
+		// 用于遍历游戏对象层次结构时的回调方法。
 		public delegate bool HierarchyWalker(GameObject curObj);
-		
+		// 获取与给定 GameObject 关联的根预制体资产
 		public static GameObject getLinkedRootPrefabAsset(GameObject obj){
 			var prefab = getLinkedPrefab(obj);
 			if (!prefab)
 				return null;
+			// PrefabUtility是Unity提供的
 			var root = PrefabUtility.FindPrefabRoot(prefab);
 			return root;
 		}
-		
+		// 获取与给定 GameObject 关联的预制体。如果对象是预制体实例，则返回其源预制体。
 		public static GameObject getLinkedPrefab(GameObject obj){
 			var prefType = PrefabUtility.GetPrefabType(obj);
 			if ((prefType == PrefabType.ModelPrefab) || (prefType == PrefabType.Prefab)){
@@ -53,7 +56,7 @@ namespace SceneExport{
 			var sourceObj = source as GameObject;
 			return sourceObj;
 		}
-		
+		// 遍历给定的 GameObject 队列，执行回调方法以处理每个对象及其子对象
 		public static void walkHierarchy(Queue<GameObject> objects, HierarchyWalker callback){
 			if (objects == null)
 				throw new System.ArgumentNullException("objects");
@@ -100,7 +103,7 @@ namespace SceneExport{
 		public static bool isValidId(int id){
 			return id >= 0;
 		}
-		
+		// 获取给定 GameObject 的完整路径（包括其父对象的名称）。
 		public static string getObjectPath(GameObject obj){
 			if (!obj)
 				return "(null)";
@@ -130,7 +133,7 @@ namespace SceneExport{
 		public static void hideProgressBar(){
 			EditorUtility.ClearProgressBar();
 		}
-		
+		// 将给定 GameObject 的组件转换为 JSON 类型的列表，使用提供的转换函数
 		public static List<JsonType> convertComponentsList<CompType, JsonType>(GameObject gameObject, 
 				System.Func<CompType, JsonType> converter) //thanks for not letting me specify constructor with parameters constraint, I guess?
 				where CompType: Component {				

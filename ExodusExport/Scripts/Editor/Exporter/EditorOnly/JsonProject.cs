@@ -41,6 +41,7 @@ namespace SceneExport{
 		
 		bool checkResourceFolder(string baseFilename, out string targetDir, out string projectPath, bool forbidProjectDir){
 			//var subDirName = System.IO.Path.GetFileNameWithoutExtension(baseFilename);
+			// 返回该路径的目录部分
 			targetDir = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(baseFilename));
 			if (!Application.isEditor){
 				throw new System.ArgumentException("The application is not running in editor mode");
@@ -60,7 +61,7 @@ namespace SceneExport{
 			//System.IO.Directory.CreateDirectory(targetDir);
 			return true;
 		}
-		
+		// 
 		bool saveResourceType<T>(List<T> resourceList, string baseFilename, string targetDir, string projectPath, bool showGui, Logger logger,
 				System.Action<T, bool, Logger> callback, string singular, string plural){
 			Logger.makeValid(ref logger);
@@ -108,7 +109,7 @@ namespace SceneExport{
 				"terrain", "terrains"
 			);;
 		}
-		
+		// 保存地形、cubemap、纹理资源
 		void saveAssetFiles(ExternalAssetList externAssets, string baseFilename, bool showGui, Logger logger = null){
 			try{
 				Logger.makeValid(ref logger);
@@ -140,7 +141,7 @@ namespace SceneExport{
 				}
 			}
 		}
-		
+		// 返回json字符串
 		public string toJsonString(){
 			FastJsonWriter writer = new FastJsonWriter();
 			writeRawJsonValue(writer);
@@ -160,7 +161,7 @@ namespace SceneExport{
 
 			System.IO.Directory.Delete(filesDir, true);
 		}
-		
+		// filename就是自己选的targetPath，是个文件路径
 		public void saveToFile(string filename, bool showGui, bool saveResourceFiles, Logger logger = null){
 			try{
 				if (showGui){
@@ -168,12 +169,14 @@ namespace SceneExport{
 						string.Format("Saving file {0}", System.IO.Path.GetFileName(filename)), 
 						"Writing json data", 0, 1);
 				}
+				// targetPath的目录部分
 				string targetDir;
 				string projectPath;
-			
+			// 检查目标目录是否可用
 				checkResourceFolder(filename, out targetDir, out projectPath, true);
 			
 				string baseName = System.IO.Path.GetFileNameWithoutExtension(filename);
+				// 与filename同名的一个文件夹
 				string filesDir = System.IO.Path.Combine(targetDir, baseName);// + "_data");
 				if (showGui){
 					confirmAndEraseExistingDirectory(filesDir);
@@ -181,7 +184,7 @@ namespace SceneExport{
 				System.IO.Directory.CreateDirectory(filesDir);
 						
 				externResourceList = resourceMapper.saveResourceToFolder(filesDir, showGui, scenes, logger, saveResourceFiles);
-			
+			// 将字符串写入jsaon文件
 				Utility.saveStringToFile(filename, toJsonString());
 
 				if (!saveResourceFiles)

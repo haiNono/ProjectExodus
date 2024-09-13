@@ -11,9 +11,11 @@ namespace SceneExport{
 					continue;
 				/*var curId = */
 				getId(curObject);//this creates id for an object
+				// 这个语句用来遍历curObject.transform 的所有子 Transform 对象
 				foreach(Transform curChild in curObject.transform){
 					if (!curChild)
 						continue;
+					// curChild.gameObject获取与该 Transform 关联的 GameObject 实例
 					if (!curChild.gameObject)
 						continue;
 					objects.Enqueue(curChild.gameObject);

@@ -40,11 +40,12 @@ namespace SceneExport{
 		public ResourceStorageWatcher<ObjectMapper<MeshStorageKey>, MeshStorageKey> createWatcher(){
 			return meshes.createWatcher();
 		}
-
+		// 为mesh注册id，添加材质
 		public ResId getOrRegMeshId(MeshStorageKey meshKey, GameObject obj, Mesh mesh){
 			if (!mesh){
 				return ResId.invalid;
 			}
+			// 给mesh添加到objList
 			ResId result = meshes.getId(meshKey, true, null);
 			if (meshMaterials.ContainsKey(mesh))
 				return result;

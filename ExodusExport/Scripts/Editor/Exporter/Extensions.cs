@@ -30,6 +30,8 @@ namespace SceneExport{
 		Returns "scenePath". Scene path is object names, divided by slash. There's no root slash.
 		Supposed to be compatible with unity property and bone naming scheme.
 		*/
+		// 给Transform类型添加新的方法getScenePath
+		// 获取一个 Transform 对象在场景中的完整路径。
 		public static string getScenePath(this Transform obj){
 			if (!obj)
 				return "";

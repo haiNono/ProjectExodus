@@ -152,7 +152,8 @@ namespace SceneExport{
 		public static bool isNullOrEmpty<T>(this T[] arg){
 			return (arg == null) || (arg.Length == 0);
 		}
-		
+		// this关键字表明这是一个扩展方法。扩展方法允许你为现有类型（在这里是 Transform）添加新的方法，而不需要修改该类型的定义。
+		// root表示调用该扩展方法的 Transform 实例
 		public static Transform findChildByName(this Transform root, string name){
 			if (!root)
 				throw new System.ArgumentNullException("root");
@@ -249,7 +250,7 @@ namespace SceneExport{
 			arg.writeRawJsonValue(writer);
 			return writer.getString();
 		}
-		
+		// 实现了IFastJsonValue接口的对象，都可以调用这个函数
 		public static void saveToJsonFile<T>(this T arg, string filename) where T: IFastJsonValue{
 			saveStringToFile(filename, arg.toJsonString());
 		}
@@ -259,7 +260,7 @@ namespace SceneExport{
 			result.SetTRS(Vector3.zero, v, Vector3.one);
 			return result;
 		}
-
+		// 将指定的字符串数据写入到一个文件中。filename文件名，如果文件不存在则会创建
 		public static void saveStringToFile(string filename, string data){
 			System.IO.File.WriteAllText(filename, data, System.Text.Encoding.UTF8);
 		}
