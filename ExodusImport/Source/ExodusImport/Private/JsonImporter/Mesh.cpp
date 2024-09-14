@@ -103,15 +103,17 @@ void JsonImporter::importSkeletalMesh(const JsonMesh &jsonMesh, int32 meshId){
 	}
 }
 
-void JsonImporter::importMesh(const JsonMesh &jsonMesh, int32 meshId){
+void JsonImporter::importMesh(const JsonMesh &jsonMesh, int32 meshId)
+{
 	UE_LOG(JsonLog, Log, TEXT("Importing mesh: %s(%d)"), *jsonMesh.name, jsonMesh.id.id)
-	UE_LOG(JsonLog, Log, TEXT("Mesh data: Verts: %d; submeshes: %d; materials: %d; colors %d; normals: %d"), 
-		jsonMesh.verts.Num(), jsonMesh.subMeshes.Num(), jsonMesh.colors.Num(), jsonMesh.normals.Num());
+	UE_LOG(JsonLog, Log, TEXT("Mesh data: Verts: %d; submeshes: %d; materials: %d; colors %d; normals: %d"),
+				 jsonMesh.verts.Num(), jsonMesh.subMeshes.Num(), jsonMesh.colors.Num(), jsonMesh.normals.Num());
 	UE_LOG(JsonLog, Log, TEXT("Mesh data: uv0: %d; uv1: %d; uv2: %d; uv3: %d; uv4: %d; uv5: %d; uv6: %d; uv7: %d;"),
-		jsonMesh.uv0.Num(), jsonMesh.uv1.Num(), jsonMesh.uv2.Num(), jsonMesh.uv3.Num(), 
-		jsonMesh.uv4.Num(), jsonMesh.uv5.Num(), jsonMesh.uv6.Num(), jsonMesh.uv7.Num());
+				 jsonMesh.uv0.Num(), jsonMesh.uv1.Num(), jsonMesh.uv2.Num(), jsonMesh.uv3.Num(),
+				 jsonMesh.uv4.Num(), jsonMesh.uv5.Num(), jsonMesh.uv6.Num(), jsonMesh.uv7.Num());
 
-	if (jsonMesh.verts.Num() <= 0){
+	if (jsonMesh.verts.Num() <= 0)
+	{
 		UE_LOG(JsonLog, Warning, TEXT("No verts found in the mesh %d!"), jsonMesh.id.id);
 	}
 
@@ -124,7 +126,8 @@ void JsonImporter::importMesh(const JsonMesh &jsonMesh, int32 meshId){
 
 	importStaticMesh(jsonMesh, meshId);
 
-	if (jsonMesh.hasBlendShapes() || jsonMesh.hasBoneWeights()){
+	if (jsonMesh.hasBlendShapes() || jsonMesh.hasBoneWeights())
+	{
 		importSkeletalMesh(jsonMesh, meshId);
 	}
 }

@@ -54,19 +54,23 @@
 
 static const FName JsonImportTabName("JsonImport");
 
+// 在模块加载到内存后执行初始化操作
 void FJsonImportModule::StartupModule(){
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	LOCTEXT("Importing textures", "Importing textures");
 	FJsonImportStyle::Initialize();
 	FJsonImportStyle::ReloadTextures();
-
+	// 注册命令到 Unreal Engine 的命令系统中
 	FJsonImportCommands::Register();
-	
+	// MakeShareable 是 Unreal Engine (UE) 提供的一个函数。它用于创建 TSharedPtr 的实例。TSharedPtr 是一个智能指针，用于管理对象的生命周期，确保在没有引用时自动释放内存
+	// FUICommandList用于管理用户界面命令，用来给按钮绑定响应函数
 	PluginCommands = MakeShareable(new FUICommandList);
 
 	PluginCommands->MapAction(
 		FJsonImportCommands::Get().PluginImportAction,
+		// 用于创建一个 FExecuteAction 对象，将一个类的成员函数与一个对象实例绑定，以便在特定事件（如按钮点击）发生时调用该成员函数
 		FExecuteAction::CreateRaw(this, &FJsonImportModule::PluginImportButtonClicked),
+		// 是 Unreal Engine 中用于定义命令是否可以执行的条件的一个结构，控制某个命令（如按钮点击、菜单项等）在特定情况下是否可用。
 		FCanExecuteAction());
 	PluginCommands->MapAction(
 		FJsonImportCommands::Get().PluginDebugAction,
@@ -130,7 +134,8 @@ void FJsonImportModule::PluginLandscapeTestButtonClicked(){
 void FJsonImportModule::PluginImportButtonClicked(){
 	// Put your "OnButtonClicked" stuff here
 	FStringArray files;
-
+	// files 用于存储用户选择的文件路径的字符串数组
+	// OpenFileDialog返回布尔值
 	if (!FDesktopPlatformModule::Get()->OpenFileDialog(0,
 			FString("Open JSON File"), FString(), FString(), FString("JSON file|*.json"), EFileDialogFlags::None, files))
 			return;

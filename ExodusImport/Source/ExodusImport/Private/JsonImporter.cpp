@@ -174,7 +174,9 @@ JsonObjPtr JsonImporter::loadExternResourceFromFile(const FString &filename) con
 }
 
 void JsonImporter::setupAssetPaths(const FString &jsonFilename){
+	// 提取目录
 	assetRootPath = FPaths::GetPath(jsonFilename);
+	// 提取不含扩展名的文件名
 	sourceBaseName = FPaths::GetBaseFilename(jsonFilename);
 	sourceExternDataPath = FPaths::Combine(*assetRootPath, *sourceBaseName);
 	assetRootPath = sourceExternDataPath;

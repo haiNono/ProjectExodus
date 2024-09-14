@@ -45,6 +45,7 @@ TSharedRef< FSlateStyleSet > FJsonImportStyle::Create()
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("JsonImportStyle"));
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("ExodusImport")->GetBaseDir() / TEXT("Resources"));
 
+// 为 FSlateStyleSet 对象设置一个名为 "ExodusImport.PluginImportAction" 的样式项，并指定其使用的图像资源
 	Style->Set("ExodusImport.PluginImportAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
 	Style->Set("ExodusImport.PluginDebugAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
 	Style->Set("ExodusImport.PluginTestAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
@@ -62,6 +63,7 @@ TSharedRef< FSlateStyleSet > FJsonImportStyle::Create()
 
 void FJsonImportStyle::ReloadTextures()
 {
+	// 获取slate实例的渲染器，并强制重新加载用户界面纹理。它针对的是插件窗口、工具栏、菜单等 UI 元素的纹理，而不是游戏中的纹理资源。
 	FSlateApplication::Get().GetRenderer()->ReloadTextureResources();
 }
 

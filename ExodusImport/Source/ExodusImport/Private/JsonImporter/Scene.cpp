@@ -120,7 +120,7 @@ UWorld* JsonImporter::importSceneObjectsAsWorld(const JsonScene &scene, const FS
 	}
 	return newWorld;
 }
-
+// 获取给定 UWorld 对象的包路径，并将其转换为文件路径。
 FString getWorldPackagePath(UWorld *world){
 	if (!world)
 		return FString();
@@ -137,7 +137,9 @@ FString getWorldPackagePath(UWorld *world){
 }
 
 void JsonImporter::importProject(const FString& filename){
+	// 组合资源路径
 	setupAssetPaths(filename);
+	// 读取json数据
 	auto jsonData = loadJsonFromFile(filename);
 	if (!jsonData){
 		UE_LOG(JsonLog, Error, TEXT("Json loading failed, aborting. \"%s\""), *filename);
@@ -148,11 +150,13 @@ void JsonImporter::importProject(const FString& filename){
 	externResources = project.externResources;
 
 	importResources(externResources);
+	// auto 关键字在 C++ 中用于自动类型推断
 	const auto& scenes = externResources.scenes;
 
 	auto singleScene = externResources.scenes.Num() == 1;
 	auto createWorldFlag = !singleScene;
 	FString lastWorldPackage;
+	// 主要用于处理耗时操作时的进度反馈和用户界面更新。
 	FScopedSlowTask sceneProgress(scenes.Num(), LOCTEXT("Importing scenes", "Importing scenes"));
 
 	StringArray importedWorlds;
@@ -176,6 +180,7 @@ void JsonImporter::importProject(const FString& filename){
 			}
 			auto curCreateFlag = createWorldFlag || createWorldRequired;
 			auto curWorld = importScene(scene, curCreateFlag);//importScene(curSceneDataObj, true);
+			// 获取UWorld 对象的包路径
 			auto curPath = getWorldPackagePath(curWorld);
 			if (!curPath.IsEmpty())
 				lastWorldPackage = curPath;

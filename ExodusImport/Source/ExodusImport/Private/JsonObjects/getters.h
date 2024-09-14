@@ -74,7 +74,7 @@ namespace JsonObjects{
 			result.Add(T(jsonObj));
 		}
 	}
-
+	// 从给定的 JSON 数据中提取一个对象，并将其转换为指定类型
 	template<typename T> void getJsonObj(JsonObjPtr jsonData, T& result, const char* name){
 		if (!jsonData || !jsonData->HasField(name))
 			return;
