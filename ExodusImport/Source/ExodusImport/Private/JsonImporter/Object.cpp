@@ -82,6 +82,7 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	UE_LOG(JsonLog, Log, TEXT("importing object: %d(%s), folder: %s, Num Components: %d"), 
 		jsonGameObj.id, *jsonGameObj.name, *folderPath, jsonGameObj.getNumComponents());
 
+
 	if (!workData.world){
 		UE_LOG(JsonLog, Warning, TEXT("No world"));
 		return ImportedObject(); 
@@ -99,18 +100,21 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	objectIsPrefab = objectIsPrefab && rebuildPrefabsWithComponents;
 
 	bool mustCreateBlankNodes = objectIsPrefab || createEmptyTransforms;//prefab objects can have no folders, so we're going to faithfully rebuild node hierarchy.
+	
 	bool createActorNodes = jsonGameObj.isPrefabRoot() || !objectIsPrefab;
 	//createActorNodes = true;
 
 	//In situation where there's no parent, we have to create an actor. Otherwise we will have no valid outer
+	// 是prefab的根组件并且不是prefab，同时没有父物体
 	createActorNodes = createActorNodes || !parentObject;
 
 	//createActorNodes = true;
 	bool rootMustBeActor = createActorNodes;
-
+	// outer是指一个actor的父级或者容器
 	UObject *existingOuter = workData.findSuitableOuter(jsonGameObj);
 	AActor *existingRootActor = nullptr;
 	AActor *createdRootActor = nullptr;
+	// [...]：方括号内的内容是捕获列表。在这里，& 表示按引用捕获外部作用域中的所有变量。这意味着在 Lambda 内部可以直接使用外部变量的引用，而不需要复制它们
 	auto outerCreator = [&]() -> UObject*{
 		if (existingOuter)
 			return existingOuter;
@@ -126,6 +130,7 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	/*
 	Here we handle creation of display geometry and colliders. This particular function call harvests colliders, reigidbody properties, builds them into a somewhat sensible hierarchy,
 	and returns root object to us
+	在这里，我们处理显示几何体和碰撞体的创建。这个特定的函数调用收集碰撞体、刚体属性，将它们构建成一个相对合理的层级，并返回根对象给我们。
 	*/
 	ImportedObject rootObject = GeometryComponentBuilder::processMeshAndColliders(workData, jsonGameObj, parentObject, folderPath, 
 		!createActorNodes,
@@ -140,11 +145,14 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 		}
 	}
 
+	// 76行至此，在创建当前JsonGameObject的rootObject 但是rootObject不是有效的
+
 	//Oh, I know. This si kinda nuts, but let's initialize root actor using lazy evaluation.
 
 	/*
 	The block below walks through every component type we currently support, and spawns unreal-side representation.
 	*/
+	// 反射探头
 	if (jsonGameObj.hasProbes()){
 		ReflectionProbeBuilder::processReflectionProbes(workData, jsonGameObj, parentObject, folderPath, &createdObjects, this, outerCreator);
 	}
@@ -160,6 +168,7 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	if (jsonGameObj.hasSkinMeshes()){
 		SkeletalMeshComponentBuilder::processSkinMeshes(workData, jsonGameObj, parentObject, folderPath, &createdObjects, this, outerCreator);
 	}
+	// 146至此，处理actor的probes、lights、terrain和skinmesh
 
 	/*
 	At this point, one of the scenarios is true:
@@ -171,6 +180,15 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	So....
 
 	It seems we only need to process the root normally, and an actor is created, but lacks root component, we set the root object as its component.
+	在这一点上，可能存在以下几种情况：
+
+1. 根演员已经由网格组件创建。（`existingRootActor` 已设置）
+2. 根演员已经由演员创建器创建，但没有场景根组件。
+3. 根演员尚未创建，但根据请求找到了外部指针。
+
+所以……
+
+看起来我们只需要正常处理根对象，如果演员已经创建但缺少根组件，我们将根对象设置为其组件。
 	*/
 
 	if (createdObjects.Num() > 1){
@@ -197,7 +215,7 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	else{
 		check(false);//This shouldn't happen, buuut....
 	}
-
+	// 194至此：根据不同情况，设置rootObject
 	if (rootObject.isValid()){
 		for (auto& cur : createdObjects){
 			if (!cur.isValid())

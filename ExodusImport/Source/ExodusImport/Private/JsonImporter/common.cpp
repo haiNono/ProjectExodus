@@ -26,7 +26,7 @@
 #include "RawMesh.h"
 
 #include "DesktopPlatformModule.h"
-
+// 从给定的资源路径数组中找到所有路径的公共目录路径
 int JsonImporter::findMatchingLength(const FString& arg1, const FString& arg2){
 	int result = 0;
 	for(; (result < arg1.Len()) && (result < arg2.Len()); result++){
@@ -35,21 +35,24 @@ int JsonImporter::findMatchingLength(const FString& arg1, const FString& arg2){
 	} 
 	return result;
 }
-
+// 找到resources内的所有路径中的公共路径
 FString JsonImporter::findCommonPath(const StringArray &resources) const{
 	FString result;
 	bool first = true;
 	int minCommonLength = 0;
 	for(auto resPath: resources){
 		UE_LOG(JsonLog, Log, TEXT("Resource %s is found"), *resPath);
+		// 从给定的文件路径 resPath 中提取出目录路径
 		auto curPath = FPaths::GetPath(resPath);
 		auto curLen = curPath.Len();
+		// 提取出文件的扩展名
 		auto ext = FPaths::GetExtension(resPath);
 		if (!ext.Len()){
 			UE_LOG(JsonLog, Warning, TEXT("Invalid ext for candidate %s"), *resPath);
 			continue;
 		}
 		if (first){
+			// resources中的第一项，是触发当前导入工程的资源的路径
 			result = curPath;
 			minCommonLength = curLen;
 			first = false;
@@ -59,6 +62,7 @@ FString JsonImporter::findCommonPath(const StringArray &resources) const{
 		auto commonLen = findMatchingLength(curPath, result);
 		if (commonLen < minCommonLength){
 			minCommonLength = commonLen;
+			// 创建一个新的 FString 对象 result，并将其初始化为 curPath 字符串的前 minCommonLength 个字符
 			result = FString(minCommonLength, *curPath);
 		}
 		if (commonLen == 0)

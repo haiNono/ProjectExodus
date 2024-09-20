@@ -22,6 +22,7 @@ UPackage* UnrealUtilities::createAssetPackage(const FString &objectName, const F
 	if (assetCreator){
 		auto newAsset = assetCreator(newPackage);
 		if (newAsset){
+			// 通知 Unreal Engine 的资产注册系统，新的资产（newAsset）已经被创建
 			FAssetRegistryModule::AssetCreated(newAsset);
 			newPackage->SetDirtyFlag(true);
 		}
@@ -33,8 +34,10 @@ UPackage* UnrealUtilities::createAssetPackage(const FString &objectName, const F
 void UnrealUtilities::addSourceModel(UStaticMesh* mesh){
 	check(mesh);
 #ifdef EXODUS_UE_VER_4_24_GE
+// 是向静态网格体（UStaticMesh）对象中添加一个新的源模型（Source Model）源模型是静态网格体的基本构建块，包含了网格的几何数据（如顶点、三角形、法线等）和其他相关信息。
 	mesh->AddSourceModel();
 #else
+// FStaticMeshSourceModel类的默认构造函数，调用这个构造函数会创建一个新的源模型对象
 	new(mesh->SourceModels) FStaticMeshSourceModel();//???
 #endif
 }
@@ -47,7 +50,7 @@ int UnrealUtilities::getNumLods(UStaticMesh *mesh){
 	return mesh->SourceModels.Num();
 #endif
 }
-
+// 获取指定 LOD（Level of Detail）级别的源模型
 FStaticMeshSourceModel& UnrealUtilities::getSourceModel(UStaticMesh *mesh, int lod){
 	check(mesh != nullptr);
 #ifdef EXODUS_UE_VER_4_24_GE
@@ -66,6 +69,7 @@ FString UnrealUtilities::sanitizeObjectName(const FString &arg){
 }
 
 FString UnrealUtilities::sanitizePackageName(const FString &arg){
+	// Unreal Engine 中自带的一个方法。它的主要功能是对包名称进行清理和标准化，以确保包名称符合 Unreal Engine 的命名规则。
 	return PackageTools::SanitizePackageName(arg);
 }
 
@@ -76,13 +80,14 @@ FString UnrealUtilities::buildPackagePath(const FString &desiredName, const FStr
 FString UnrealUtilities::buildPackagePath(const FString &desiredName, const FString *desiredDir, const JsonImporter *importer){
 	if (importer){
 		auto commonPath = importer->getAssetCommonPath();
+		// 文件导入后放置资源的位置
 		auto importPath = importer->getProjectImportPath();
 		return buildPackagePath(desiredName, desiredDir, &importPath, &commonPath);
 	}
 	return buildPackagePath(desiredName, desiredDir, nullptr, nullptr);
 }
 
-
+// 构建目标资源的路径
 FString UnrealUtilities::buildPackagePath(const FString &desiredName, const FString *desiredDir, const FString *defaultPackageRoot, const FString *commonAssetPath){
 	FString packageRoot = defaultPackageRoot ? *defaultPackageRoot: *getDefaultImportPath();
 
@@ -442,7 +447,7 @@ FVector UnrealUtilities::getUnityRightVector(){
 FVector UnrealUtilities::getUnityForwardVector(){
 	return FVector(0.0f, 0.0f, 1.0f);
 }
-
+// 处理层级
 void UnrealUtilities::setObjectHierarchy(const ImportedObject &object, ImportedObject *parentObject, 
 	const FString& folderPath, ImportContext &workData, const JsonGameObject &gameObj, bool setActiveFlag){
 	if (parentObject){

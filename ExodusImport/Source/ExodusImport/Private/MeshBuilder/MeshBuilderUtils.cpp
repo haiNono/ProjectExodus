@@ -8,7 +8,9 @@ void MeshBuilderUtils::processTangent(int originalIndex, const FloatArray &normF
 		std::function<void(const FVector&)> normCallback, std::function<void(const FVector&, const FVector&)> tanCallback){
 	if (!hasNormals)
 		return;
+	// 第originalIndex个点三个坐标
 	auto unityNorm = getIdxVector3(normFloats, originalIndex);
+	// 转换坐标
 	auto normUnreal = unityVecToUe(unityNorm);
 	if (normCallback)
 		normCallback(normUnreal);
@@ -21,6 +23,7 @@ void MeshBuilderUtils::processTangent(int originalIndex, const FloatArray &normF
 
 	auto uTanUnreal = unityVecToUe(uTanUnity);
 	//auto vTanUnreal = FVector::CrossProduct(uTanUnreal, normUnreal) * unityTangent.W;
+	// w表示第四个分量
 	auto vTanUnreal = FVector::CrossProduct(normUnreal, uTanUnreal) * unityTangent.W;
 	/* 
 		I suspect unity gets normals wrong on at least SOME geometry, but can't really prove it.

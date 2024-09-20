@@ -124,13 +124,17 @@ namespace UnrealUtilities{
 			bool checkForExistingObjects = true){
 
 		T* finalResult;
+		// 对名称进行标准化
 		auto sanitizedName = sanitizeObjectName(*objectName);
 		createAssetPackage(objectName, desiredDir, importer,
+		// assetCreator
 			[&](UPackage* pkg) -> T*{
 				T* newObj = nullptr;
 				if (checkForExistingObjects){
+					// 查找指定包 (pkg) 中是否存在sanitizedName对象
 					auto *oldObj = FindObject<T>(pkg, *sanitizedName);
 					if (oldObj){
+						// MakeUniqueObjectName是Unreal Engine 提供的一个函数，用于从基础名称生成一个唯一的对象名称
 						auto uniqueName = MakeUniqueObjectName(pkg, T::StaticClass(), *sanitizedName).ToString();
 						UE_LOG(JsonLog, Log, TEXT("Unique name created: %s (old obj: %x). Original name: %s"), *uniqueName, oldObj, *sanitizedName);
 						sanitizedName = uniqueName;

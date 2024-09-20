@@ -14,7 +14,7 @@ void JsonScene::load(JsonObjPtr data){
 
 	buildInstanceIdMap();
 }
-
+// 使用map存储objects数组中的元素
 void JsonScene::buildInstanceIdMap(){
 	gameObjectInstanceIdMap.Empty();
 	for (const auto& obj : objects){

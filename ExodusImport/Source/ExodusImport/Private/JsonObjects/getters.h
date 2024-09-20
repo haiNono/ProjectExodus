@@ -51,7 +51,7 @@ namespace JsonObjects{
 			}
 		);
 	}
-
+	// 从jsondata中读取name字段的数组，添加到result中去
 	template<typename T> void getJsonObjArray(JsonObjPtr jsonData, TArray<T>& result, const char* name, bool optional = false){
 		result.Empty();
 		if (optional){

@@ -131,13 +131,14 @@ bool ImportContext::isCompoundRigidbodyRootCollider(const JsonGameObject &gameOb
 	check(false);//somehow we found neither rigidbody nor colliders? This is an illegal scene graph and likely an error
 	return false;
 }
-
+// 创建一个空的actor
 AActor* ImportContext::createBlankActor(const JsonGameObject &gameObj, bool createMissingRootComponent) const{
 	using namespace UnrealUtilities;
 	check(world);
 	FTransform transform;
+	// 根据给定的矩阵设置变换的值。该函数会解析矩阵中的位置、旋转和缩放信息，并将其应用到 FTransform 对象上。
 	transform.SetFromMatrix(gameObj.ueWorldMatrix);
-
+	// 使用指定的变换 (transform) 在给定的世界 (world) 中生成一个新的演员 (AActor)
 	AActor *blankActor = world->SpawnActor<AActor>(AActor::StaticClass(), transform);
 	USceneComponent *rootComponent = nullptr;
 	if (createMissingRootComponent){
@@ -193,11 +194,13 @@ ImportedObject ImportContext::createBlankNode(const JsonGameObject &gameObj, boo
 		check(outerPtr != nullptr);
 	}
 	else{
+		// 函数返回一个指向“临时包”（Transient Package）的指针
 		outerPtr = GetTransientPackage();
 	}
-
+	// USceneComponent：用于表示场景组件的基类
 	auto *rootComponent = NewObject<USceneComponent>(outerPtr);
 	rootComponent->SetWorldTransform(transform);
+	// 物体的看移动性
 	rootComponent->SetMobility(gameObj.getUnrealMobility());
 
 	//auto nameGuid = FGuid::NewGuid();

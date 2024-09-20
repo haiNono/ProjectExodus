@@ -68,6 +68,7 @@ UWorld* JsonImporter::importScene(const JsonScene &scene, bool createWorld){
 	}
 
 	if (!createWorld){
+		// GEditor 是一个全局指针，指向当前的编辑器实例。
 		ImportContext workData(GEditor->GetEditorWorldContext().World(), editorMode, &scene);
 		loadObjects(scene.objects, workData);
 		return nullptr;
@@ -178,9 +179,9 @@ void JsonImporter::importProject(const FString& filename){
 					createWorldRequired = true;
 				}
 			}
+			// 场景数量不止一个或者只有一个场景但是包含Terrain才为true
 			auto curCreateFlag = createWorldFlag || createWorldRequired;
 			auto curWorld = importScene(scene, curCreateFlag);//importScene(curSceneDataObj, true);
-			// 获取UWorld 对象的包路径
 			auto curPath = getWorldPackagePath(curWorld);
 			if (!curPath.IsEmpty())
 				lastWorldPackage = curPath;

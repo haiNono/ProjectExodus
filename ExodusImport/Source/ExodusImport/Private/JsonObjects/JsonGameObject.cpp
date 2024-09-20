@@ -193,7 +193,7 @@ EComponentMobility::Type JsonGameObject::getUnrealMobility() const{
 		return EComponentMobility::Static;
 	return EComponentMobility::Movable;
 }
-
+// 物体属于prefab
 bool JsonGameObject::usesPrefab() const{
 	return (prefabRootId >= 0) && (prefabObjectId >= 0);
 }

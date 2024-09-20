@@ -97,7 +97,7 @@ void JsonBlendShape::load(JsonObjPtr data){
 
 	getJsonObjArray(data, frames, "frames");
 }
-
+// 根据给定的路径、名称和 ID 创建一个格式化的字符串，确保生成的名称在项目中是唯一的
 FString JsonMesh::makeUnrealMeshName() const{
 	auto pathBaseName = FPaths::GetBaseFilename(path);
 	FString result;

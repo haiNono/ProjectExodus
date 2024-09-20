@@ -13,7 +13,7 @@
 
 using namespace JsonObjects;
 using namespace UnrealUtilities;
-
+// 文件导入后放置资源的位置
 FString JsonImporter::getProjectImportPath() const{
 	auto result = getDefaultImportPath();
 	if (result.Len() && sourceBaseName.Len())
@@ -167,16 +167,16 @@ void JsonImporter::importResources(const JsonExternResourceList &externRes){
 	//loadAnimClipsDebug(externRes.animationClips);
 	//loadAnimatorsDebug(externRes.animatorControllers); 
 }
-
+// 加载json文件并返回json对象指针
 JsonObjPtr JsonImporter::loadExternResourceFromFile(const FString &filename) const{
 	auto fullPath = FPaths::Combine(sourceExternDataPath, filename);
 	return loadJsonFromFile(fullPath);
 }
-
+// 设置路径字符串（一个目录名）：项目json目录 / 不含扩展名的项目json文件名
 void JsonImporter::setupAssetPaths(const FString &jsonFilename){
-	// 提取目录
+	// 提取项目json文件的目录
 	assetRootPath = FPaths::GetPath(jsonFilename);
-	// 提取不含扩展名的文件名
+	// 提取不含扩展名的文件名，不包含目录路径
 	sourceBaseName = FPaths::GetBaseFilename(jsonFilename);
 	sourceExternDataPath = FPaths::Combine(*assetRootPath, *sourceBaseName);
 	assetRootPath = sourceExternDataPath;
@@ -214,7 +214,7 @@ void JsonImporter::registerMaterialInstancePath(int32 id, FString path){
 	}
 	matInstIdMap.Add(id, path);
 }
-
+// 把材质加载进来
 UMaterialInterface* JsonImporter::loadMaterialInterface(int32 id) const{
 	return loadMaterialInstance(id);
 }

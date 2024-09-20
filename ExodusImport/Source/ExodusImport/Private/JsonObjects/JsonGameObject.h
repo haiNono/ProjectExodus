@@ -99,7 +99,7 @@ public:
 
 	FTransform getUnrealTransform(const FVector& localUnityOffset) const;
 	FTransform getUnrealTransform() const;
-
+	// FMatrix::Identity是单位矩阵
 	FMatrix ueWorldMatrix = FMatrix::Identity;
 	FString ueName;
 

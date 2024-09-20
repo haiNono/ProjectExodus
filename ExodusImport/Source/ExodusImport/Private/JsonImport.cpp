@@ -144,7 +144,7 @@ void FJsonImportModule::PluginImportButtonClicked(){
 			UE_LOG(JsonLog, Log, TEXT("No file to open"));
 			return;
 	}
-
+	// 将文件的相对路径转换为完整的绝对路径。
 	auto filename = FPaths::ConvertRelativePathToFull(files[0]);
 	JsonImporter importer;
 	importer.importProject(filename);

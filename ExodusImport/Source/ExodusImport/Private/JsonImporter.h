@@ -24,6 +24,7 @@ protected:
 	FString assetRootPath;//TODO: rename to srcAssetRootPath. Points to json file folder.
 	FString sourceExternDataPath;
 	FString assetCommonPath;
+	// 当前导入工程的json的文件名，不含扩展名
 	FString sourceBaseName;
 	ResIdNameMap meshIdMap;
 	ResIdNameMap skinMeshIdMap;
@@ -179,6 +180,7 @@ public:
 	/*
 	Ugh, this function again. I need to replace it with more compact version
 	*/
+	// 创建一个新的 Unreal Engine 包（UPackage），并根据提供的参数设置包的名称和路径
 	template<typename T> UPackage* createPackage(const FString &name, 
 			const FString &srcFilePath, const FString &targetRootPath, 
 			const FString &objNameSuffix, FString *outPackageName, 
