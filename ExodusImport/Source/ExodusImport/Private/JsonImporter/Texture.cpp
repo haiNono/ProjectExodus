@@ -233,7 +233,7 @@ void JsonImporter::importTexture(JsonObjPtr obj, const FString &rootPath){
 void JsonImporter::importTexture(const JsonTexture &jsonTex, const FString &rootPath){
 	UE_LOG(JsonLog, Log, TEXT("Texture: %s, %s, %d x %d"), 
 		*jsonTex.path, *jsonTex.name, jsonTex.width, jsonTex.height);
-
+	// 是否为法线贴图
 	bool isNormalMap = false;
 	
 	if (jsonTex.importDataFound && jsonTex.normalMapFlag){
@@ -253,6 +253,7 @@ void JsonImporter::importTexture(const JsonTexture &jsonTex, const FString &root
 
 	FString textureName;
 	FString packageName;
+	// 创建一个UPackage
 	UPackage *texturePackage = createPackage(jsonTex.name, jsonTex.path, rootPath, FString("Texture"), 
 		&packageName, &textureName, &existingTexture);
 
@@ -265,18 +266,19 @@ void JsonImporter::importTexture(const JsonTexture &jsonTex, const FString &root
 	TArray<uint8> binaryData;
 
 	FString fileSystemPath = FPaths::Combine(*assetRootPath, *jsonTex.path);
-
+	// tif后缀改成png后缀
 	if (ext.ToLower() == FString("tif")){
 		UE_LOG(JsonLog, Warning, TEXT("TIF image extension found! Fixing it to png: %s. Image will fail to load if no png file is present."), *fileSystemPath);
 		ext = FString("png");
 		
 		FString pathPart, namePart, extPart;
+		// 分割路径
 		FPaths::Split(fileSystemPath, pathPart, namePart, extPart);
 		FString newBaseName = FString::Printf(TEXT("%s.%s"), *namePart, *ext);
 		fileSystemPath = FPaths::Combine(*pathPart, *newBaseName);
 		UE_LOG(JsonLog, Warning, TEXT("New path: %s"), *fileSystemPath);
 	}
-
+// 将texture文件加载为二进制文件
 	if (!FFileHelper::LoadFileToArray(binaryData, *fileSystemPath)){
 		UE_LOG(JsonLog, Warning, TEXT("Could not load texture %s(%s)"), *jsonTex.name, *jsonTex.path);
 		return;
@@ -288,8 +290,11 @@ void JsonImporter::importTexture(const JsonTexture &jsonTex, const FString &root
 	}
 
 	UE_LOG(JsonLog, Log, TEXT("Loading tex data: %s (%d bytes)"), *jsonTex.name, binaryData.Num());
+	// 创建纹理工厂
 	auto texFab = NewObject<UTextureFactory>();
+	// 告诉引擎不要在垃圾回收（Garbage Collection）时自动销毁这个对象
 	texFab->AddToRoot();
+	// 这个方法的作用是抑制（或禁用）在导入纹理时出现的覆盖确认对话框。
 	texFab->SuppressImportOverwriteDialog();
 	const uint8* data = binaryData.GetData();
 
@@ -297,13 +302,14 @@ void JsonImporter::importTexture(const JsonTexture &jsonTex, const FString &root
 		texFab->LODGroup = TEXTUREGROUP_WorldNormalMap;
 		texFab->CompressionSettings = TC_Normalmap;
 	}
-
+// 创建纹理
 	UE_LOG(JsonLog, Log, TEXT("Attempting to create package: texName %s"), *jsonTex.name);
 	UTexture *unrealTexture = (UTexture*)texFab->FactoryCreateBinary(
 		UTexture2D::StaticClass(), texturePackage, *textureName, RF_Standalone|RF_Public, 0, *ext, data, data + binaryData.Num(), GWarn);
 
 	if (unrealTexture){
 		texIdMap.Add(jsonTex.id, unrealTexture->GetPathName());
+		// 这一步使得纹理资源在内容浏览器中可见。
 		FAssetRegistryModule::AssetCreated(unrealTexture);
 		texturePackage->SetDirtyFlag(true);
 	}

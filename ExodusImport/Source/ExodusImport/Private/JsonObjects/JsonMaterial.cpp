@@ -134,6 +134,7 @@ bool JsonMaterial::nameMarkedCutout() const{
 	return name.Contains(TEXT("/Transparent/Cutout/"), ESearchCase::CaseSensitive);
 }
 
+// 返回filename_name_id
 FString JsonMaterial::getUnrealMaterialName() const{
 	//Duplicated code. Need to do something about it later.
 	auto pathBaseName = FPaths::GetBaseFilename(path);

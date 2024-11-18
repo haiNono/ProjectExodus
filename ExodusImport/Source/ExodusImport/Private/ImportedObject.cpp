@@ -146,6 +146,7 @@ void ImportedObject::fixEditorVisibility() const{
 		return;
 	auto rootActor = component->GetAttachmentRootActor();
 	check(rootActor);
+	// 在运行时向一个 Actor 添加一个新的组件实例
 	rootActor->AddInstanceComponent(component);
 }
 

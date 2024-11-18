@@ -27,6 +27,16 @@ Likewise the components can be created in vacuum, but if we want to see them, we
 and when they're registered, they can no longer be safely moved to another outer (can unregister them though).
 
 Currently the system tries use correct outer right at the beginning, as a result the Outer is provided via a callback. This can be and likely should be simplified in the future.
+没有owner的对象将被创建为瞬态，这包括组件。
+瞬态对象最终会消失。
+要使组件可见，它必须在 Actor 中注册，这样 Actor 才能为它创建渲染 / 物理状态。
+要在 Unreal 编辑器中显示对象，必须将其注册为实例组件。
+在对象尚未注册之前，更改其外部对象（Outer）是安全的。组件内部有一个所有者检查，当所有者不匹配时会抛出断言。
+基本上，我们可以完全创建所有对象为瞬态，然后更改所有者，但是，我们需要处理注册它们，并将它们实例注册。
+同样，组件可以在真空中创建，但如果我们想看到它们，我们必须注册它们，如果它们应该在层级中可编辑，它们应该被添加为实例组件，
+并且当它们注册后，它们就不能再安全地移动到另一个外部对象（可以注销它们）。
+目前的系统试图在一开始就使用正确的外部对象，结果是外部对象通过回调提供。这在未来可以也应该被简化。
+
 */
 
 /*
@@ -58,17 +68,41 @@ Therefore, we need to create a blank actor IN ADVANCE, and use that blank actor 
 Additioanlly, previously discarded version where I attempted to create chidl components with specifying owners had a glitch where the components created this way were not properly registering in the scene.
 
 So. I scrapped the whole branch, and started over.
+我们遇到了一个难题。
+情况是这样的：
+由多个 Actor 构成的场景图不能自动地收集到蓝图中。
+将对象收集到蓝图中会打开蓝图编辑器（对于大量的蓝图来说很麻烦）。
+显然，骨骼网格可能会导致整个过程崩溃。
+因此，需要进行一次重大的重构。
+首先，存在一类情况，其中对象需要被重构为单一 Actor，且 Actor 节点被启用为根节点。
+这种情况发生在预制件（prefabs）或预制件实例中。
+问题仍然存在，如何追踪与预制件实例相关联的非预制件对象。但这个问题可以稍后再考虑。
+在处理预制件实例的情况下，我们需要在底部创建一个根节点，并且生成空的场景节点作为组件。
+因为内容不再作为文件夹工作。
+此外，我们希望追踪那些具有单个组件并生成特定 Actor 的单个对象的情况。
+这并不是严格必要的，但很理想，例如，光源将是点光源 Actor 而不是 Actor。
+另外，所有权的问题也很棘手。看起来，将组件作为瞬态包的一部分创建，然后切换所有权到非瞬态包会导致该组件消失。
+我有点好奇为什么会这样，可能我错过了更新垃圾回收链接数量的部分。
+因此，我们需要提前创建一个空白 Actor，并将这个空白 Actor 作为所有子组件的所有者。
+另外，我之前尝试创建子组件时指定了所有者，但存在一个缺陷，这样创建的组件没有在场景中正确注册。
+所以，我放弃了整个分支，重新开始。
 
 To summarize the rules:
 * an object spawns actor instance, if it is not part of a prefab instance and has components.
 * an objects spawns nothing, if it is not a part of a prefab instance, and has no components.
 * an objects spawns components, if it is a part of prefab instance. 
 * prefab instance has AActor as its base class, EXCEPT the situation where it is dealing with a single component object...? 
-
+总结规则如下：
+如果对象不是预制件实例的一部分，并且拥有组件，则会生成 Actor 实例。
+如果对象不是预制件实例的一部分，并且没有组件，则不会生成任何东西。
+如果对象是预制件实例的一部分，则会生成组件。
+预制件实例以 AActor 为基类，除非它处理的是单个组件对象的情况...？
 Hmm... (-_-)
 
 Current plan - disable creation of prefabs.
 Add handling of prefab instances according to those rules.
+当前计划 - 禁用预制件的创建。
+根据这些规则添加对预制件实例的处理。
 */
 
 /*
@@ -77,7 +111,7 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	using namespace UnrealUtilities;
 
 	auto* parentObject = workData.findImportedObject(jsonGameObj.parentId);
-
+	
 	auto folderPath = workData.processFolderPath(jsonGameObj);
 	UE_LOG(JsonLog, Log, TEXT("importing object: %d(%s), folder: %s, Num Components: %d"), 
 		jsonGameObj.id, *jsonGameObj.name, *folderPath, jsonGameObj.getNumComponents());
@@ -95,6 +129,7 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	//auto objectType = DesiredObjectType::Default;
 	/*
 	When importing prefabs, child actor nodes are not being harvested correctly. They have to be rebuilt as component-only structures
+	在导入预制件时，子 Actor 节点没有被正确地收集。它们必须被重建为仅包含组件的结构
 	*/
 	bool objectIsPrefab = jsonGameObj.usesPrefab();
 	objectIsPrefab = objectIsPrefab && rebuildPrefabsWithComponents;
@@ -105,12 +140,13 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	//createActorNodes = true;
 
 	//In situation where there's no parent, we have to create an actor. Otherwise we will have no valid outer
-	// 是prefab的根组件并且不是prefab，同时没有父物体
+	// 是prefab的根组件并且不是prefab，同时没有父物体.即，只是一个座位容器的Actor
 	createActorNodes = createActorNodes || !parentObject;
 
 	//createActorNodes = true;
 	bool rootMustBeActor = createActorNodes;
-	// outer是指一个actor的父级或者容器
+	// outer是指一个actor的根actor
+	// findSuitableOuter从已导入的objects中找到当前jsonGameObj的根actor
 	UObject *existingOuter = workData.findSuitableOuter(jsonGameObj);
 	AActor *existingRootActor = nullptr;
 	AActor *createdRootActor = nullptr;
@@ -145,7 +181,7 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 		}
 	}
 
-	// 76行至此，在创建当前JsonGameObject的rootObject 但是rootObject不是有效的
+	// 76行至此，在创建当前JsonGameObject的rootObject 但是rootObject未必是有效的
 
 	//Oh, I know. This si kinda nuts, but let's initialize root actor using lazy evaluation.
 
@@ -292,6 +328,25 @@ ImportedObject JsonImporter::importObject(const JsonGameObject &jsonGameObj, Imp
 	This is ... convoluted.
 
 	Let's see if I can, after all, turn rigibody into a component instead of relying on semi-random merges.
+	让我们总结一下碰撞处理方法和差异。
+	Unity 具有独立的刚体组件。
+	Unreal 没有。相反，随机的几何体可以拥有属性，这些属性会被转移到刚体上。
+	Unity 具有独立的网格碰撞器组件。
+	Unreal 没有。
+	另外，在 Unreal 中，网格可能不会生成碰撞数据？
+	Unity 通过将碰撞器附加到找到的刚体上来创建复合体。
+	Unreal... 显然可以将碰撞器降低到一定程度。
+	那么，我们的方法是什么呢？
+	在存在物理控制实体的情况下，或者如果有碰撞存在...
+	可能产生的碰撞器应该被合并成一个层级结构，其中第一个碰撞器持有 Unity 中刚体的属性。
+	其他的必须附加到它上面，以便作为碰撞器合并。
+	更重要的是，所有其他组件，如灯光，都应该附加到那个第一个 “刚体” 组件上，它将作为根。
+	因此，为了正确地做到这一点，我们需要首先构建碰撞器。然后构建静态网格。
+	然后将它们列出来，并将一切都附加到第一个碰撞器上，然后祈祷这能按预期工作。
+	根组件也应该被设置为 actor 的根。
+	接下来的组件，如探针、灯光等，无论是 Actor 还是组件本身，都将被附加到那个根物理组件上。
+	这... 是复杂的。
+	让我们看看我是否能够，毕竟，将刚体转换为一个组件，而不是依赖于半随机的合并。
 	*/
 
 	/*

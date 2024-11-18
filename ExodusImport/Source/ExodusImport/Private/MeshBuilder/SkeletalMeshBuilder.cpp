@@ -105,6 +105,7 @@ void SkeletalMeshBuildData::processWedgeData(const JsonMesh &jsonMesh){
 	for(int subMeshIndex = 0; subMeshIndex < jsonMesh.subMeshes.Num(); subMeshIndex++){
 		const auto &curSubMesh = jsonMesh.subMeshes[subMeshIndex];
 		for(int vertIndexOffset = 0; (vertIndexOffset + 2) < curSubMesh.triangles.Num(); vertIndexOffset += 3){
+			// 向数组中添加一个默认构造的元素，并返回对该元素的引用
 			auto& dstFace = meshFaces.AddDefaulted_GetRef();
 			dstFace.MeshMaterialIndex = subMeshIndex;
 			dstFace.SmoothingGroups = 0;

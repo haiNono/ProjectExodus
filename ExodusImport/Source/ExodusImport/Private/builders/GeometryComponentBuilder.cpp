@@ -26,7 +26,12 @@ ImportedObject GeometryComponentBuilder::processMeshAndColliders(ImportContext& 
 	* If mesh is present, but does not have a collider, then it is parented to the collider mini-tree. The reasoning for that is that colliders govern rigidbody movement, so the mesh should follow components.
 	* If the mesh is present, and is used as a collider, then it becomes the root of collider mini-tree, and the rest of the colliders are parented to it.
 
+	如果没有网格和碰撞器，我们返回空白对象。
+	如果没有网格，但存在碰撞器，那么选择一个碰撞器作为 “根”（root），并将其他碰撞器作为其子对象。
+	如果存在网格，但没有碰撞器，那么网格将被附加到碰撞器的 “小树”（mini-tree）上。这样做是因为碰撞器控制刚体的移动，所以网格应该跟随这些组件。
+	如果存在网格，并且网格本身用作碰撞器，那么它将成为碰撞器 “小树” 的根，其他碰撞器将被附加到它上面。
 	Mesh must be attached to a moving collider, as collider doubles down as a rigidbody.
+	网格必须附加到一个可移动的碰撞器上，因为碰撞器同时充当刚体。
 	*/
 
 	/*
@@ -38,12 +43,17 @@ ImportedObject GeometryComponentBuilder::processMeshAndColliders(ImportContext& 
 	Meaning.... by default we need to find closest parent, and grab "Outer" from there.
 
 	If there's no such parent, OR if the user requested an actor, then we either spawn a blank, OR process static mesh as an actor and return that.
+	组件不能在真空中创建，它需要被封装在一个包（Package）中。
+	默认情况下，这个包是 “Transient”（临时的），但是临时包会消失。
+	这意味着，默认情况下我们需要找到最近的父级，并从那里获取 “Outer”（外部容器）。
+	如果没有这样的父级，或者如果用户请求了一个 Actor，那么我们要么生成一个空白的 Actor，要么将静态网格作为 Actor 处理并返回它。
 	*/
 
 	//UObject* outer = nullptr;
 
 	/*
 	We only need outer for components. If components weren't requested, an actor would be created and will serve as outer container for everything else
+	我们只需要为组件提供外部容器。如果不需要组件，那么将创建一个 Actor，它将作为所有其他内容的外部容器
 	*/
 	bool componentRequested = spawnAsComponents;//(desiredObjectType == DesiredObjectType::Component);
 	if (componentRequested)
@@ -75,7 +85,7 @@ ImportedObject GeometryComponentBuilder::processMeshAndColliders(ImportContext& 
 	*/
 
 	bool hasRenderers = jsonGameObj.hasRenderers();
-
+	// 根据mesh创建一个actor或者Component节点
 	if (jsonGameObj.hasMesh()) {
 		if (!jsonGameObj.hasColliders()) {//only display mesh is present
 			return processStaticMesh(workData, jsonGameObj, parentObject, folderPath, nullptr, 
@@ -257,6 +267,7 @@ ImportedObject GeometryComponentBuilder::processStaticMesh(ImportContext &workDa
 		check(curOuter);
 		/*if (curOuter == nullptr)
 			curOuter = GetTransientPackage();*/
+		// curOuter是该组件的父级或容器
 		meshComp = NewObject<UStaticMeshComponent>(curOuter);
 		meshComp->SetWorldTransform(transform);
 	}
@@ -316,7 +327,7 @@ ImportedObject GeometryComponentBuilder::processStaticMesh(ImportContext &workDa
 
 	return result;
 }
-
+// 根据碰撞类型创建一个UPrimitiveComponent组件（用于设置碰撞），设置后返回
 UPrimitiveComponent* GeometryComponentBuilder::processCollider(ImportContext &workData, const JsonGameObject &jsonGameObj, 
 		OuterCreatorCallback outerCreator,//UObject *ownerPtr, 
 		const JsonCollider &collider, JsonImporter *importer){

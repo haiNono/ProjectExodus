@@ -105,7 +105,7 @@ void PrefabBuilder::importPrefab(const JsonPrefabData& prefab, JsonImporter *imp
 		blueprintPackage->SetDirtyFlag(true);
 	}
 }
-
+// #if 0 的作用是将其后面的代码块标记为“未编译”或“注释掉”
 #if 0
 void JsonImporter::importPrefab(const JsonPrefabData& prefab){
 #ifdef JSON_DISABLE_PREFAB_IMPORT

@@ -127,7 +127,7 @@ namespace UnrealUtilities{
 		// 对名称进行标准化
 		auto sanitizedName = sanitizeObjectName(*objectName);
 		createAssetPackage(objectName, desiredDir, importer,
-		// assetCreator
+		// assetCreator 给传入的pkg中创建asset
 			[&](UPackage* pkg) -> T*{
 				T* newObj = nullptr;
 				if (checkForExistingObjects){

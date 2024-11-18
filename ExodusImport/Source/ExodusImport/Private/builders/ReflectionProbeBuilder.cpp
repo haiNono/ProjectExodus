@@ -10,6 +10,7 @@
 #include "JsonImporter.h"
 
 //void setupReflectionCapture(UReflectionCaptureComponent *reflComponent, const JsonReflectionProbe &probe);
+// 将 Unity 场景中的反射探针数据转换为虚幻引擎中的反射探针组件和 Actor
 ImportedObject ReflectionProbeBuilder::processReflectionProbe(ImportContext &workData, const JsonGameObject &gameObj,
 	const JsonReflectionProbe &probe, ImportedObject *parentObject, const FString &folderPath, JsonImporter *importer, std::function<UObject*()> outerCallback){
 	using namespace UnrealUtilities;

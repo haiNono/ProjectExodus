@@ -75,7 +75,7 @@ std::pair<ActorClass*, ComponentClass*> createLightActorAndComponent(
 
 	return std::make_pair(lightActor, lightComponent);
 }
-
+// 根据 Unity 场景中的光源数据创建对应的虚幻引擎光源 Actor 和组件
 ImportedObject LightBuilder::processLight(ImportContext &workData, const JsonGameObject &gameObj, const JsonLight &jsonLight, ImportedObject *parentObject,
 		const FString& folderPath, bool createActors, std::function<UObject*()> outerCreator){
 	using namespace UnrealUtilities;

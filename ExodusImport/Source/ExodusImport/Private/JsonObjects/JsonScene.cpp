@@ -2,7 +2,7 @@
 #include "JsonScene.h"
 #include "macros.h"
 
-
+// 将scene中的object分别存储到数组和map中
 void JsonScene::load(JsonObjPtr data){
 	using namespace JsonObjects;
 

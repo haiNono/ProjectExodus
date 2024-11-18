@@ -50,6 +50,7 @@ namespace SceneExport{
 			}
 			if ((prefType != PrefabType.ModelPrefabInstance) && (prefType != PrefabType.PrefabInstance))
 				return null;
+			// 获取obj对应的源预制题中的组件或游戏对象
 			var source = PrefabUtility.GetCorrespondingObjectFromSource(obj);
 			if (!source)
 				return null;

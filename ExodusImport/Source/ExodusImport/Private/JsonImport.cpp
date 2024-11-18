@@ -94,6 +94,7 @@ void FJsonImportModule::StartupModule(){
 	{
 		TSharedPtr<FExtender> MenuExtender = MakeShareable(new FExtender());
 		MenuExtender->AddMenuExtension("WindowLayout", EExtensionHook::After, PluginCommands, 
+		// 在 AddMenuExtension 方法的参数中，使用 FMenuExtensionDelegate::CreateRaw 创建了一个委托，该委托绑定到 FJsonImportModule 类的 AddMenuExtension 方法。这意味着当菜单扩展被触发时，FExtender 将调用这个委托，从而执行 AddMenuExtension 方法。
 			FMenuExtensionDelegate::CreateRaw(this, &FJsonImportModule::AddMenuExtension));
 
 		LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);

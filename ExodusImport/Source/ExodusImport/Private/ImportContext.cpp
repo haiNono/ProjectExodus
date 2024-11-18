@@ -64,7 +64,7 @@ ImportedObject* ImportContext::findImportedObject(JsonId id){
 const FString* ImportContext::findFolderPath(JsonId id) const{
 	return objectFolderPaths.Find(id);
 }
-
+// 返回当前物体的parent路径
 FString ImportContext::processFolderPath(const JsonGameObject &jsonGameObj){
 	FString folderPath;
 	FString childFolderPath = jsonGameObj.ueName;
@@ -83,7 +83,7 @@ FString ImportContext::processFolderPath(const JsonGameObject &jsonGameObj){
 	objectFolderPaths.Add(jsonGameObj.id, childFolderPath);
 	return folderPath;
 }
-
+// 找到Actor的根Actor
 UObject* ImportContext::findSuitableOuter(const JsonGameObject &jsonObj) const{
 	using namespace JsonObjects;
 
@@ -92,6 +92,7 @@ UObject* ImportContext::findSuitableOuter(const JsonGameObject &jsonObj) const{
 	while (isValidId(parentId)){
 		auto foundImported = importedObjects.Find(parentId);
 		if (foundImported){
+			// 获取一个 AActor 对象的 “根” 或 “主” AActor
 			auto rootActor = foundImported->findRootActor();
 			if (rootActor)
 				return rootActor;
@@ -194,7 +195,7 @@ ImportedObject ImportContext::createBlankNode(const JsonGameObject &gameObj, boo
 		check(outerPtr != nullptr);
 	}
 	else{
-		// 函数返回一个指向“临时包”（Transient Package）的指针
+		// 函数返回一个指向“临时包”（Transient Package）的指针 ue自带方法
 		outerPtr = GetTransientPackage();
 	}
 	// USceneComponent：用于表示场景组件的基类

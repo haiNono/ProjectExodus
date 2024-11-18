@@ -321,6 +321,7 @@ namespace SceneExport{
 		public ResId getRootPrefabId(GameObject obj, bool createMissing){
 			if (!obj)
 				return ResId.invalid;//ExportUtility.invalidId;
+			// 会调用unity的方法，找到prefab的root
 			var rootPrefab = ExportUtility.getLinkedRootPrefabAsset(obj);
 			if (!rootPrefab)
 				return ResId.invalid;//ExportUtility.invalidId;
@@ -333,6 +334,7 @@ namespace SceneExport{
 		public ResId gatherPrefabData(GameObject obj){
 			if (!obj)
 				return ResId.invalid;//ExportUtility.invalidId;
+			// 返回obj所属的prefab的ResId
 			return getRootPrefabId(obj, true);
 		}
 		

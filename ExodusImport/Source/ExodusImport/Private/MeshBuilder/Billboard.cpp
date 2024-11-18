@@ -3,7 +3,7 @@
 #include "UnrealUtilities.h"
 
 using namespace UnrealUtilities;
-
+// 生成一个用于显示 billboard的mesh
 void MeshBuilder::generateBillboardMesh(UStaticMesh *staticMesh, UMaterialInterface *billboardMaterial){
 	check(staticMesh);
 	check(billboardMaterial);

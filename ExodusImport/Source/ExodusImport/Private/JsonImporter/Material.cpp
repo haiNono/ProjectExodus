@@ -42,6 +42,7 @@ UMaterialInstanceConstant* JsonImporter::loadMaterialInstance(int32 id) const{
 		return 0;
 	}
 	auto matPath = *foundPath;
+	// Cast<T>() 是 Unreal Engine 提供的一个模板函数，用于安全地将对象指针转换为指定类型。
 	UMaterialInstanceConstant *mat = Cast<UMaterialInstanceConstant>(
 		StaticLoadObject(UMaterialInstanceConstant::StaticClass(), 0, *matPath));
 	UE_LOG(JsonLog, Log, TEXT("Material instance located"));

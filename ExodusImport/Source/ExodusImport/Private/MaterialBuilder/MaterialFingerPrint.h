@@ -13,6 +13,7 @@ public:
 		Fade = 2,
 		Transparent = 3
 	};
+	// union 是 C++ 中的一种数据结构，允许在同一内存位置存储不同的数据类型。
 	union{
 		struct{
 			//textures

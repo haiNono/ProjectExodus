@@ -180,12 +180,12 @@ public:
 	/*
 	Ugh, this function again. I need to replace it with more compact version
 	*/
-	// 创建一个新的 Unreal Engine 包（UPackage），并根据提供的参数设置包的名称和路径
+	// 在工程中对应层级位置上创建一个新的 Unreal Engine 包（UPackage），并根据提供的参数设置包的名称和路径
 	template<typename T> UPackage* createPackage(const FString &name, 
 			const FString &srcFilePath, const FString &targetRootPath, 
 			const FString &objNameSuffix, FString *outPackageName, 
 			FString *outObjName, T** outExistingObj) const{
-
+		// 待导入资源所在目录
 		FString objDir = FPaths::GetPath(srcFilePath);
 
 		auto objSuffixName = ObjectTools::SanitizeObjectName(name + TEXT("_") + objNameSuffix);
@@ -194,7 +194,7 @@ public:
 		UE_LOG(JsonLog, Log, TEXT("Creating package. Object name: %s, filename: %s"), *objName, *objInFileName);
 
 		FString packageName;
-
+		// 构建工程中的导入资源目录：Game/Import/json项目名/xxx
 		FString packageRoot = TEXT("/Game/Import");
 		if (sourceBaseName.Len())
 			packageRoot = packageRoot + TEXT("/") + sourceBaseName;
@@ -203,6 +203,7 @@ public:
 		if (objDir.Len() > 0){
 			if (objDir.StartsWith(assetCommonPath)){
 				UE_LOG(JsonLog, Log, TEXT("Reducing asset path: %s"), *objDir);
+				// 这行代码执行的结果是，从*objDir中去掉assetCommonPath的长度个字符
 				objDir = FString(*objDir + assetCommonPath.Len());
 				UE_LOG(JsonLog, Log, TEXT("Shortened path: %s"), *objDir);
 			}
@@ -226,17 +227,21 @@ public:
 		UPackage *package = 0;
 
 		T*existingObj = 0;
+		// 这三个代码块是检查这两个路径上有没有已经被加载进来的资源，避免重复加载。最后的else就是两次加载都没有加载成功，说明路径上没有资源，那就新建一个package
 		{
 			FString objPath = packageName + TEXT(".") + objSuffixName;
+			// LoadObject 方法是 Unreal Engine 自带的一个函数，用于加载指定路径的对象。
+			// 这里load是看这个路径上是不是已经有资产了，如果已经有的的话，就给加载仅这个package里来，同时函数外层能够感知到，就不会重复创建这样的一个纹理
 			existingObj = Cast<T>(LoadObject<T>(0, *objPath));
 		}
-
+		// 以 exterior_door 为例，objName 为 exterior_door，objSuffix Name 为 exterior_door_texture
 		if (!existingObj){
 			FString objPath = packageName + TEXT(".") + objName;
 			existingObj = Cast<T>(LoadObject<T>(0, *objPath));
 		}
 
 		if (existingObj){
+			// 获取最外层对象
 			package = existingObj->GetOutermost();
 		}
 		else{

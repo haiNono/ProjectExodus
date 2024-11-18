@@ -128,19 +128,27 @@ namespace SceneExport{
 			}
 			
 			isStatic = obj.isStatic;
+			// 获取gameobject的静态编辑器标志，标志决定了如何处理对象，如是否将其包含在光照计算中、是否视为静态碰撞器等
 			var flags = GameObjectUtility.GetStaticEditorFlags(obj);
 		#if UNITY_2019_2_OR_NEWER
+		// 枚举值，用于指示一个游戏对象是否应该参与全局光照（Global Illumination，简称 GI）的计算
 			lightMapStatic = (flags & StaticEditorFlags.ContributeGI) != 0;
 		#else
+		// 枚举值，指示游戏对象是否应该被包含在光照贴图（lightmapping）中
 			lightMapStatic = (flags & StaticEditorFlags.LightmapStatic) != 0;
 		#endif
 		// 与遮挡相关的属性
+			// 用于控制游戏对象在编辑器中的静态状态。
 			occluderStatic = (flags & StaticEditorFlags.OccluderStatic) != 0;
 			occludeeStatic = (flags & StaticEditorFlags.OccludeeStatic) != 0;
+			// 枚举中的一个标志，用于指示游戏对象是否应该被包含在导航网格（Navigation Mesh，简称 NavMesh）的计算中。
 			navigationStatic = (flags & StaticEditorFlags.NavigationStatic) != 0;
+			// 枚举中的一个标志，用于指示游戏对象是否应该被用作反射探针（Reflection Probe）的静态环境。
 			reflectionProbeStatic = (flags & StaticEditorFlags.ReflectionProbeStatic) != 0;
-			
+
+			// 用于检查游戏对象（GameObject）是否处于激活状态。
 			activeSelf = obj.activeSelf;
+			// 定义 GameObject 在 Scene 中是否处于活动状态。
 			activeInHierarchy = obj.activeInHierarchy;
 			
 			//var prefType = PrefabUtility.GetPrefabType(obj);

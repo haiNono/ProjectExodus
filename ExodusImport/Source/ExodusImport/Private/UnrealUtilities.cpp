@@ -12,7 +12,8 @@ UPackage* UnrealUtilities::createAssetPackage(const FString &objectName, const F
 		const JsonImporter *importer, std::function<UObject*(UPackage*)> assetCreator){
 
 	auto fullPackagePath = buildPackagePath(objectName, desiredDir, importer);
-
+// CreatePackage方法第二个参数TEXT("/Game/MyNewPackage")是这个新包的路径和名称，它告诉 Unreal Engine 这个包应该位于哪个虚拟路径下。但他并不会在文件系统中创建一个实际的文件。
+// 这个函数只是在内存中创建了一个UPackage对象的实例，这个对象代表了将要存储资源的容器。
 #ifdef EXODUS_UE_VER_4_26_GE
 	auto newPackage = CreatePackage(*fullPackagePath);
 #else
@@ -469,7 +470,7 @@ void UnrealUtilities::registerImportedObject(ImportedObjectArray *outArray, cons
 		return;
 	outArray->Push(arg);
 }
-
+// 将传入的场景组件添加到其所属的根 Actor 上。
 void UnrealUtilities::convertToInstanceComponent(USceneComponent *comp){
 	if (!comp)
 		return;
@@ -477,7 +478,7 @@ void UnrealUtilities::convertToInstanceComponent(USceneComponent *comp){
 	check(rootActor);
 	rootActor->AddInstanceComponent(comp);
 }
-
+// 指定的场景组件 (USceneComponent) 在 Unreal Engine 编辑器中可见和可编辑
 void UnrealUtilities::makeComponentVisibleInEditor(USceneComponent *comp){
 	if (!comp)
 		return;

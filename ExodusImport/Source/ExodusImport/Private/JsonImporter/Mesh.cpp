@@ -40,6 +40,7 @@ using namespace JsonObjects;
 
 void JsonImporter::importStaticMesh(const JsonMesh &jsonMesh, int32 meshId){
 	auto unrealMeshName = jsonMesh.makeUnrealMeshName();
+	// 提取路径的目录部分
 	auto desiredDir = FPaths::GetPath(jsonMesh.path);
 	auto mesh = createAssetObject<UStaticMesh>(unrealMeshName, &desiredDir, this, 
 		[&](UStaticMesh *mesh){

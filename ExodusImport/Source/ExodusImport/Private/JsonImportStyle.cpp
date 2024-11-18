@@ -42,10 +42,13 @@ const FVector2D Icon40x40(40.0f, 40.0f);
 
 TSharedRef< FSlateStyleSet > FJsonImportStyle::Create()
 {
+	// MakeShareable创建指针，能够自动管理内存。使用智能指针可以避免内存泄漏和悬挂指针等问题，因为它们会在不再需要时自动释放内存。
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("JsonImportStyle"));
+	// 用于设置样式的内容根目录
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("ExodusImport")->GetBaseDir() / TEXT("Resources"));
 
 // 为 FSlateStyleSet 对象设置一个名为 "ExodusImport.PluginImportAction" 的样式项，并指定其使用的图像资源
+// "ExodusImport.PluginImportAction" 是样式项的名称。这个名称通常与命令或功能相关联，表示该样式项是为 PluginImportAction 命令定义的。
 	Style->Set("ExodusImport.PluginImportAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
 	Style->Set("ExodusImport.PluginDebugAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
 	Style->Set("ExodusImport.PluginTestAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));

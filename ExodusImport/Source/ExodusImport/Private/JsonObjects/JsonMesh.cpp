@@ -14,7 +14,7 @@ void JsonSubMesh::load(JsonObjPtr data){
 
 void JsonMesh::load(JsonObjPtr data){
 	using namespace JsonObjects;
-
+// 从data中获取id属性，并赋给jsonMesh的id属性
 	JSON_GET_VAR(data, id);
 	JSON_GET_VAR(data, name);
 	JSON_GET_VAR(data, uniqueName);

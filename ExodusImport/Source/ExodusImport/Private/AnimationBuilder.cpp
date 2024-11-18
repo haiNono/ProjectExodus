@@ -71,7 +71,7 @@ void AnimationBuilder::buildAnimation(UAnimSequence *animSeq, USkeleton *skel, c
 			addRawTrackBoneKey(rawAnimTrack, lastKey);
 			frameIndex++;
 		}
-
+		// 向动画序列中插入新的维嘉懂的动画数据轨道
 		animSeq->AddNewRawTrack(*matCurve.objectName, &rawAnimTrack);
 	}
 

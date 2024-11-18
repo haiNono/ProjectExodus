@@ -99,7 +99,7 @@ UWorld* JsonImporter::importSceneObjectsAsWorld(const JsonScene &scene, const FS
 		UE_LOG(JsonLog, Warning, TEXT("World already exists for %s(%s)"), *sceneName, *scenePath);
 		return nullptr;
 	}
-
+	// CastChecked用于将 factory->FactoryCreateNew 方法返回的对象转换为 UWorld 类型。
 	UWorld *newWorld = CastChecked<UWorld>(factory->FactoryCreateNew(
 		UWorld::StaticClass(), worldPackage, *outWorldName, flags, 0, GWarn));
 
